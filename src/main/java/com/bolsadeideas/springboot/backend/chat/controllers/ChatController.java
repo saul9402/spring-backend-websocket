@@ -38,4 +38,10 @@ public class ChatController {
 		return mensaje;
 	}
 
+	@MessageMapping(value = "/escribiendo")
+	@SendTo(value = "/chat/escribiendo")
+	public String estaEscribiendo(String username) {
+		return username.concat(" està escribiendo...");
+	}
+
 }
