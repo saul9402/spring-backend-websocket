@@ -6,6 +6,7 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import com.bolsadeideas.springboot.backend.chat.models.documents.Mensaje;
@@ -18,6 +19,9 @@ public class ChatController {
 
 	@Autowired
 	private ChatService chatService;
+
+	@Autowired
+	private SimpMessagingTemplate webSocket;
 
 	/**
 	 * Con esta anotación se indica la url donde van a llegar los mensajes, publica
@@ -49,6 +53,12 @@ public class ChatController {
 	@SendTo(value = "/chat/escribiendo")
 	public String estaEscribiendo(String username) {
 		return username.concat(" está escribiendo...");
+	}
+
+	@MessageMapping(value = "/historial")
+//	@SendTo(value = "/chat/historial"); se cambia la anotación por el convertAndSend() donde se especifica mejor a quien se va a emitir este evento
+	public void historial(String clienteId) {
+		webSocket.convertAndSend("/chat/historial/".concat(clienteId), chatService.obtenerUltimos10Mensajes());
 	}
 
 }
