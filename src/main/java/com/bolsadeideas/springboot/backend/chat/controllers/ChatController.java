@@ -3,16 +3,21 @@ package com.bolsadeideas.springboot.backend.chat.controllers;
 import java.util.Date;
 import java.util.Random;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 import com.bolsadeideas.springboot.backend.chat.models.documents.Mensaje;
+import com.bolsadeideas.springboot.backend.chat.models.service.ChatService;
 
 @Controller
 public class ChatController {
 
 	private String[] colores = { "red", "green", "blue", "magenta", "purple", "orange" };
+
+	@Autowired
+	private ChatService chatService;
 
 	/**
 	 * Con esta anotación se indica la url donde van a llegar los mensajes, publica
@@ -34,6 +39,8 @@ public class ChatController {
 		if (mensaje.getTipo().equals("NUEVO_USUARIO")) {
 			mensaje.setColor(colores[new Random().nextInt(colores.length)]);
 			mensaje.setTexto("Nuevo Usuario");
+		} else {
+			chatService.guardar(mensaje);
 		}
 		return mensaje;
 	}
@@ -41,7 +48,7 @@ public class ChatController {
 	@MessageMapping(value = "/escribiendo")
 	@SendTo(value = "/chat/escribiendo")
 	public String estaEscribiendo(String username) {
-		return username.concat(" està escribiendo...");
+		return username.concat(" está escribiendo...");
 	}
 
 }
